@@ -1,0 +1,30 @@
+name: Fetch and Save XML Files
+
+on:
+  workflow_dispatch:
+  watch:
+    types: [started]
+  schedule:
+    - cron: "0 */2 * * *"
+
+jobs:
+  fetch_and_save:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      
+      - name: Fetch XML files
+        run: |
+          current_time=$(date +"%Y-%m-%d %H:%M:%S")
+          curl -o "pp.xml.gz" https://epg.112114.xyz/pp.xml.gz
+          curl -o "e1.xml.gz" http://epg.51zmt.top:8000/e.xml.gz
+          curl -o "e2.xml.gz" https://gitee.com/Black_crow/xmlgz/raw/master/all.xml.gz
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .
+          git commit -m "Update XML files (${current_time})"
+          git push -f origin main
