@@ -1,0 +1,42 @@
+name: Fetch and Save Cloudflare Files
+
+on:
+  workflow_dispatch:
+  watch:
+    types: [started]
+  schedule:
+    - cron: "0 */6 * * *"
+
+jobs:
+  fetch_and_save:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      
+      - name: Fetch XML files
+        run: |
+          export TZ="Asia/Shanghai"
+          current_time=$(date +"%Y-%m-%d %H:%M:%S")
+          echo "current_time=${current_time}" >> $GITHUB_ENV
+          curl -o "colo" https://www.baipiao.eu.org/cloudflare/colo
+          curl -o "url" https://www.baipiao.eu.org/cloudflare/url
+          curl -o "ips-v4" https://www.baipiao.eu.org/cloudflare/ips-v4
+          curl -o "ips-v6" https://www.baipiao.eu.org/cloudflare/ips-v6
+
+      - name: Commit and push changes
+        env:
+          current_time: ${{ env.current_time }}
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .
+          if git diff-index --quiet HEAD --; then
+            echo "No changes to commit"
+          else
+            git stash
+            git pull --rebase origin main
+            git stash pop
+            git commit -m "更新时间：${{ env.current_time }}"
+            git push origin main
+          fi
