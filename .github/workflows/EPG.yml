@@ -30,12 +30,14 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add .
+          git status  # 检查添加的文件状态
           if git diff-index --quiet HEAD --; then
             echo "No changes to commit"
           else
             git stash
             git pull --rebase origin main
             git stash pop
+            git status  # 检查工作目录状态
             git commit -m "更新时间：${{ env.current_time }}"
             git push origin main
           fi
