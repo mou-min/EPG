@@ -1,0 +1,45 @@
+name: Fetch and Save better-cloudflare-ip
+
+on:
+  workflow_dispatch:
+  watch:
+    types: [started]
+  schedule:
+    - cron: "0 * */2 * *"
+
+jobs:
+  fetch_and_save:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      
+      - name: Fetch XML files
+        run: |
+          export TZ="Asia/Shanghai"
+          current_time=$(date +"%Y-%m-%d %H:%M:%S")
+          echo "current_time=${current_time}" >> $GITHUB_ENV
+          curl https://raw.githubusercontent.com/badafans/better-cloudflare-ip/master/shell/cf.sh -o cf.sh
+          sed -i 's|https://www.baipiao.eu.org/cloudflare/|https://fastly.jsdelivr.net/gh/mou-min/EPG/|g' cf.sh
+          sed -i 's|https://fastly.jsdelivr.net/gh/mou-min/EPG/ips-v4|https://fastly.jsdelivr.net/gh/mou-min/EPG/ips-v4_c|g' cf.sh
+          sed -i 's|^read.*bandwidth$|bandwidth=80|' cf.sh
+          sed -i 's|^read.*tasknum$|tasknum=32|' cf.sh
+          sed -i 's|^.*read.*menu$|    menu=1|' cf.sh
+
+      - name: Commit and push changes
+        env:
+          current_time: ${{ env.current_time }}
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .
+          if git diff-index --quiet HEAD --; then
+            echo "No changes to commit"
+          else
+            git stash
+            git pull --rebase origin main
+            git stash pop
+            git add .
+            git commit -m "更新时间：${{ env.current_time }}"
+            git push origin main
+          fi
