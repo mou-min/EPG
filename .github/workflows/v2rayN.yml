@@ -24,7 +24,7 @@ jobs:
           pre_release=$(echo $latest_release | jq -r .prerelease)
           echo "::set-output name=tag::$tag"
           echo "::set-output name=pre_release::$pre_release"
-          echo "::set-output name=assets::$(echo $latest_release | jq -r .assets)"
+          echo "::set-output name=assets::$(echo $latest_release | jq -c .assets)"
 
       - name: Create directory for downloads
         run: mkdir -p v2rayN
@@ -35,17 +35,18 @@ jobs:
           tag="${{ steps.get_release.outputs.tag }}"
           pre_release="${{ steps.get_release.outputs.pre_release }}"
 
-          if [ "$pre_release" = "true" ]; then
-            suffix="_pre-release_$tag"
-          else
-            suffix="_release_$tag"
-          fi
-
+          echo "Assets JSON: $assets"  # 调试信息
           echo "$assets" | jq -c '.[]' > assets.txt
 
           if [ ! -s assets.txt ]; then
             echo "No assets found."
             exit 0
+          fi
+
+          if [ "$pre_release" = "true" ]; then
+            suffix="_pre-release_$tag"
+          else
+            suffix="_release_$tag"
           fi
 
           while IFS= read -r asset; do
