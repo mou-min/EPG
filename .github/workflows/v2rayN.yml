@@ -41,7 +41,12 @@ jobs:
             suffix="_release_$tag"
           fi
 
-          for asset in $assets; do
+          if [ -z "$assets" ]; then
+            echo "No assets found."
+            exit 0
+          fi
+
+          for asset in $(echo "$assets" | jq -c '.'); do
             name=$(echo "$asset" | jq -r .name)
             url=$(echo "$asset" | jq -r .browser_download_url)
             new_name="v2rayN/${name%.zip}$suffix.zip"
@@ -63,4 +68,3 @@ jobs:
             git commit -m "更新时间：${{ env.current_time }}"
             git pull --rebase origin main
             git push origin main
-          fi
