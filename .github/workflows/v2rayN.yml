@@ -22,9 +22,10 @@ jobs:
           latest_release=$(echo "$releases" | jq -c '[.[] | select(.draft == false)][0]')
           tag=$(echo $latest_release | jq -r .tag_name)
           pre_release=$(echo $latest_release | jq -r .prerelease)
+          assets=$(echo $latest_release | jq -c '.assets')
           echo "::set-output name=tag::$tag"
           echo "::set-output name=pre_release::$pre_release"
-          echo "::set-output name=assets::$(echo $latest_release | jq -c .assets)"
+          echo "::set-output name=assets::$assets"
 
       - name: Create directory for downloads
         run: mkdir -p v2rayN
@@ -62,12 +63,4 @@ jobs:
           current_time: ${{ env.current_time }}
         run: |
           git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add .
-          git status  # 检查添加的文件状态
-          if git diff-index --quiet HEAD --; then
-            echo "No changes to commit"
-          else
-            git commit -m "更新时间：${{ env.current_time }}"
-            git pull --rebase origin main
-            git push origin main
+          git config
