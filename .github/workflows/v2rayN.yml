@@ -1,0 +1,66 @@
+name: Download Latest v2rayN Release
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: '0 0 * * *' # 每天运行一次
+
+jobs:
+  download-v2rayn:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      
+      - name: Get latest v2rayN release including pre-releases
+        id: get_release
+        run: |
+          releases=$(curl -s https://api.github.com/repos/2dust/v2rayN/releases)
+          latest_release=$(echo "$releases" | jq -c '[.[] | select(.draft == false)][0]')
+          tag=$(echo $latest_release | jq -r .tag_name)
+          pre_release=$(echo $latest_release | jq -r .prerelease)
+          echo "::set-output name=tag::$tag"
+          echo "::set-output name=pre_release::$pre_release"
+          echo "::set-output name=assets::$(echo $latest_release | jq -r .assets)"
+
+      - name: Create directory for downloads
+        run: mkdir -p v2rayN
+
+      - name: Download assets
+        run: |
+          assets=$(echo "${{ steps.get_release.outputs.assets }}" | jq -c '.[]')
+          tag=${{ steps.get_release.outputs.tag }}
+          pre_release=${{ steps.get_release.outputs.pre_release }}
+
+          if [ "$pre_release" = "true" ]; then
+            suffix="_pre-release_$tag"
+          else
+            suffix="_release_$tag"
+          fi
+
+          for asset in $assets; do
+            name=$(echo "$asset" | jq -r .name)
+            url=$(echo "$asset" | jq -r .browser_download_url)
+            new_name="v2rayN/${name%.zip}$suffix.zip"
+            echo "Downloading $name from $url to $new_name"
+            curl -L -o $new_name $url
+          done
+
+      - name: Commit and push changes
+        env:
+          current_time: ${{ env.current_time }}
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .
+          git status  # 检查添加的文件状态
+          if git diff-index --quiet HEAD --; then
+            echo "No changes to commit"
+          else
+            git commit -m "更新时间：${{ env.current_time }}"
+            git pull --rebase origin main
+            git push origin main
+          fi
