@@ -1,66 +1,45 @@
-name: Download Latest v2rayN Release
+name: Fetch v2rayN Releases
 
 on:
-  push:
-    branches:
-      - main
   schedule:
     - cron: '0 0 * * *' # 每天运行一次
+  workflow_dispatch: # 手动触发
 
 jobs:
-  download-v2rayn:
+  fetch-releases:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Get latest v2rayN release including pre-releases
-        id: get_release
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
         run: |
-          releases=$(curl -s https://api.github.com/repos/2dust/v2rayN/releases)
-          latest_release=$(echo "$releases" | jq -c '[.[] | select(.draft == false)][0]')
-          tag=$(echo $latest_release | jq -r .tag_name)
-          pre_release=$(echo $latest_release | jq -r .prerelease)
-          assets=$(echo $latest_release | jq -c '.assets')
-          echo "::set-output name=tag::$tag"
-          echo "::set-output name=pre_release::$pre_release"
-          echo "::set-output name=assets::$assets"
+          python -m pip install requests
 
-      - name: Create directory for downloads
-        run: mkdir -p v2rayN
-
-      - name: Download assets
+      - name: Fetch v2rayN releases
+        env:
+          GITHUB_REPOSITORY: '2dust/v2rayN'
         run: |
-          assets="${{ steps.get_release.outputs.assets }}"
-          tag="${{ steps.get_release.outputs.tag }}"
-          pre_release="${{ steps.get_release.outputs.pre_release }}"
-
-          echo "Assets JSON: $assets"  # 调试信息
-          echo "$assets" | jq -c '.[]' > assets.txt
-
-          if [ ! -s assets.txt ]; then
-            echo "No assets found."
-            exit 0
-          fi
-
-          if [ "$pre_release" = "true" ]; then
-            suffix="_pre-release_$tag"
-          else
-            suffix="_release_$tag"
-          fi
-
-          while IFS= read -r asset; do
-            name=$(echo "$asset" | jq -r .name)
-            url=$(echo "$asset" | jq -r .browser_download_url)
-            new_name="v2rayN/${name%.zip}$suffix.zip"
-            echo "Downloading $name from $url to $new_name"
-            curl -L -o "$new_name" "$url"
-          done < assets.txt
+          python fetch_releases.py
 
       - name: Commit and push changes
         env:
-          current_time: ${{ env.current_time }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config --local user.email "action@github.com"
-          git config
+          git config --local user.name "GitHub Action"
+          git add v2rayN_releases.json
+          git status  # 检查添加的文件状态
+          if git diff-index --quiet HEAD --; then
+            echo "No changes to commit"
+          else
+            current_time=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+            git commit -m "更新时间：$current_time"
+            git pull --rebase origin main
+            git push origin main
