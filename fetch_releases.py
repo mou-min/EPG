@@ -33,9 +33,6 @@ def fetch_releases(repository):
     return filtered_releases
 
 def save_releases_to_file(releases, filename):
-    # 确保目录存在
-    os.makedirs(os.path.dirname(filename), exist_ok=True)
-
     try:
         with open(filename, 'w') as f:
             json.dump(releases, f, indent=2)
