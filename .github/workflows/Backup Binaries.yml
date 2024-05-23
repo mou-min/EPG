@@ -17,15 +17,19 @@ jobs:
 
       - name: Set timezone and current time
         run: |
+          set -e
           export TZ="Asia/Shanghai"
           current_time=$(date +"%Y-%m-%d %H:%M:%S")
           echo "current_time=${current_time}" >> $GITHUB_ENV
 
       - name: Install dependencies
-        run: sudo apt-get install -y aria2 jq
+        run: |
+          set -e
+          sudo apt-get install -y aria2 jq
 
       - name: Download and setup 7zip
         run: |
+          set -e
           mkdir -p Archive
           cd Archive
           mkdir -p 7zip
@@ -35,24 +39,28 @@ jobs:
 
       - name: Download v2rayN assets
         run: |
+          set -e
           mkdir -p Archive/v2rayn
           cd Archive/v2rayn
           wget -qO- https://api.github.com/repos/2dust/v2rayN/releases/latest | jq -r ".assets[].browser_download_url" | xargs -n 1 -P 8 aria2c -x 16 -s 16
 
       - name: Download v2rayNG assets
         run: |
+          set -e
           mkdir -p Archive/v2rayng
           cd Archive/v2rayng
           wget -qO- https://api.github.com/repos/2dust/v2rayNG/releases/latest | jq -r ".assets[].browser_download_url" | xargs -n 1 -P 8 aria2c -x 16 -s 16
 
       - name: Install Git LFS
         run: |
+          set -e
           curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
           sudo apt-get install git-lfs
           git lfs install
 
       - name: Configure Git user
         run: |
+          set -e
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
 
@@ -60,26 +68,30 @@ jobs:
         env:
           current_time: ${{ env.current_time }}
         run: |
+          set -e
           git lfs track "*.zip"
           git lfs track "*.7z"
           git lfs track "*.apk"
           git add .gitattributes
           git commit -m "更新时间：${{ env.current_time }}"
-	  
+
       - name: Commit and push changes
         env:
           current_time: ${{ env.current_time }}
         run: |
+          set -e
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add Archive/
           if git diff-index --quiet HEAD --; then
             echo "No changes to commit"
           else
+            echo "Files to be committed:"
+            git diff-index --name-only HEAD
             git stash
             git pull --rebase origin main
             git stash pop
             git add Archive/
             git commit -m "更新时间：${{ env.current_time }}"
             git push origin main
-          fi 
+          fi
