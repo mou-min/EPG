@@ -51,6 +51,11 @@ jobs:
           sudo apt-get install git-lfs
           git lfs install
 
+      - name: Configure Git user
+        run: |
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
+
       - name: Track large files with Git LFS
         run: |
           git lfs track "*.zip"
