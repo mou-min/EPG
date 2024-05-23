@@ -80,3 +80,4 @@ jobs:
             git add Archive/
             git commit -m "Backup binaries: ${{ env.current_time }}"
             git push origin main
+          fi 
