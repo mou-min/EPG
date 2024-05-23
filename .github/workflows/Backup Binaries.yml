@@ -35,14 +35,14 @@ jobs:
 
       - name: Download v2rayN assets
         run: |
-          mkdir -p Archive/v2rayn
-          cd Archive/v2rayn
+          mkdir -p Archive/v2rayn/Clients
+          cd Archive/v2rayn/Clients
           wget -qO- https://api.github.com/repos/2dust/v2rayN/releases/latest | jq -r ".assets[].browser_download_url" | xargs -n 1 -P 8 aria2c -x 16 -s 16
 
       - name: Download v2rayNG assets
         run: |
-          mkdir -p Archive/v2rayng
-          cd Archive/v2rayng
+          mkdir -p Archive/v2rayng/Clients
+          cd Archive/v2rayng/Clients
           wget -qO- https://api.github.com/repos/2dust/v2rayNG/releases/latest | jq -r ".assets[].browser_download_url" | xargs -n 1 -P 8 aria2c -x 16 -s 16
 
       - name: Install Git LFS
@@ -64,7 +64,7 @@ jobs:
           git lfs track "*.7z"
           git lfs track "*.apk"
           git add .gitattributes
-          git commit -m "Track large files with Git LFS"
+          git commit -m "更新时间：${{ env.current_time }}"
 
       - name: Commit and push changes
         env:
@@ -82,4 +82,4 @@ jobs:
             git add Archive/
             git commit -m "更新时间：${{ env.current_time }}"
             git push origin main
-          fi 
+          fi
