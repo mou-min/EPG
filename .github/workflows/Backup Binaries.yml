@@ -24,16 +24,25 @@ jobs:
       - name: Install dependencies
         run: sudo apt-get install -y aria2 jq
 
+      - name: Download and setup 7zip
+        run: |
+          mkdir -p Archive
+          cd Archive
+          mkdir -p 7zip
+          wget "https://www.7-zip.org/a/7z2301-linux-x64.tar.xz" -O 7zip/7zip.tar.xz
+          tar -xf 7zip/7zip.tar.xz -C 7zip/ && mv 7zip/7zz .
+          rm -rf 7zip && chmod +x 7zz
+
       - name: Download v2rayN assets
         run: |
-          mkdir -p Archive/v2rayn
-          cd Archive/v2rayn
+          mkdir -p Archive/v2rayn/Clients
+          cd Archive/v2rayn/Clients
           wget -qO- https://api.github.com/repos/2dust/v2rayN/releases/latest | jq -r ".assets[].browser_download_url" | xargs -n 1 -P 8 aria2c -x 16 -s 16
 
       - name: Download v2rayNG assets
         run: |
-          mkdir -p Archive/v2rayng
-          cd Archive/v2rayng
+          mkdir -p Archive/v2rayng/Clients
+          cd Archive/v2rayng/Clients
           wget -qO- https://api.github.com/repos/2dust/v2rayNG/releases/latest | jq -r ".assets[].browser_download_url" | xargs -n 1 -P 8 aria2c -x 16 -s 16
 
       - name: Install Git LFS
@@ -64,6 +73,7 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add Archive/
+          git add .gitattributes
           if git diff-index --quiet HEAD --; then
             echo "No changes to commit"
           else
@@ -71,6 +81,7 @@ jobs:
             git pull --rebase origin main
             git stash pop
             git add Archive/
+            git add .gitattributes
             git commit -m "更新时间：${{ env.current_time }}"
             git push origin main
-          fi  # 结束 if 语句
+          fi
