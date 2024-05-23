@@ -16,6 +16,9 @@ jobs:
       
       - name: Backup Binaries
         run: |
+          export TZ="Asia/Shanghai"
+          current_time=$(date +"%Y-%m-%d %H:%M:%S")
+          echo "current_time=${current_time}" >> $GITHUB_ENV
           sudo apt install -y aria2
           mkdir Archive
           cd Archive
@@ -24,28 +27,6 @@ jobs:
           wget "https://www.7-zip.org/a/7z2301-linux-x64.tar.xz" -O 7zip/7zip.tar.xz
           tar -xf 7zip/7zip.tar.xz -C 7zip/ && mv 7zip/7zz .
           rm -rf 7zip && chmod +x 7zz
-          sudo mv 7zz /usr/bin
-          # Recover Binaries from : https://github.com/bolucat/rules/releases/tag/software-archived
-          # shadowsocks-windows
-          mkdir -p shadowsocks-windows/Clients
-          pushd shadowsocks-windows/Clients || exit 1
-          wget -qO- https://api.github.com/repos/shadowsocks/shadowsocks-windows/releases/latest | jq ".assets[] | {browser_download_url}" -c | jq .browser_download_url -r | aria2c -c -x 8 -s 8 -j 1 -k 1M -i -
-          popd || exit 1
-          # shadowsocks-android
-          mkdir -p shadowsocks-android/Clients
-          pushd shadowsocks-android/Clients || exit 1
-          wget -qO- https://api.github.com/repos/shadowsocks/shadowsocks-android/releases/latest | jq ".assets[] | {browser_download_url}" -c | jq .browser_download_url -r | aria2c -c -x 8 -s 8 -j 1 -k 1M -i -
-          popd || exit 1
-          # shadowsocksx-ng
-          mkdir -p shadowsocksx-ng/Clients
-          pushd shadowsocksx-ng/Clients || exit 1
-          wget -qO- https://api.github.com/repos/shadowsocks/ShadowsocksX-NG/releases/latest | jq ".assets[] | {browser_download_url}" -c | jq .browser_download_url -r | aria2c -c -x 8 -s 8 -j 1 -k 1M -i -
-          popd || exit 1
-          # juicity
-          mkdir -p juicity/Clients
-          pushd juicity/Clients || exit 1
-          wget -qO- https://api.github.com/repos/juicity/juicity/releases/latest | jq ".assets[] | {browser_download_url}" -c | jq .browser_download_url -r | aria2c -c -x 8 -s 8 -j 1 -k 1M -i -
-          popd || exit 1
           # v2rayn
           mkdir -p v2rayn/Clients
           pushd v2rayn/Clients || exit 1
@@ -55,142 +36,6 @@ jobs:
           mkdir -p v2rayng/Clients
           pushd v2rayng/Clients || exit 1
           wget -qO- https://api.github.com/repos/2dust/v2rayNG/releases/latest | jq ".assets[] | {browser_download_url}" -c | jq .browser_download_url -r | aria2c -c -x 8 -s 8 -j 1 -k 1M -i -
-          popd || exit 1
-          # v2rayu
-          mkdir -p v2rayu/Clients
-          pushd v2rayu/Clients || exit 1
-          wget -qO- https://api.github.com/repos/yanue/V2rayU/releases/latest | jq ".assets[] | {browser_download_url}" -c | jq .browser_download_url -r | aria2c -c -x 8 -s 8 -j 1 -k 1M -i -
-          popd || exit 1
-          # v2raya
-          mkdir -p v2raya/Clients
-          pushd v2raya/Clients || exit 1
-          wget -qO- https://api.github.com/repos/v2rayA/v2rayA/releases/latest | jq ".assets[] | {browser_download_url}" -c | jq .browser_download_url -r | aria2c -c -x 8 -s 8 -j 1 -k 1M -i -
-          popd || exit
-          # clash-rev
-          mkdir -p clash-rev/Clients
-          pushd clash-rev/Clients || exit 1
-          wget -qO- https://api.github.com/repos/MerlinKodo/clash-rev/releases/latest | jq ".assets[] | {browser_download_url}" -c | jq .browser_download_url -r | aria2c -c -x 8 -s 8 -j 1 -k 1M -i -
-          popd || exit 1
-          # mihomo
-          mkdir -p mihomo/Clients
-          pushd mihomo/Clients || exit 1
-          wget -qO- https://api.github.com/repos/MetaCubeX/mihomo/releases/latest | jq ".assets[] | {browser_download_url}" -c | jq .browser_download_url -r | aria2c -c -x 8 -s 8 -j 1 -k 1M -i -
-          popd || exit 1
-          # clash-meta-android
-          mkdir -p clash-meta-android/Clients
-          pushd clash-meta-android/Clients || exit 1
-          wget -qO- https://api.github.com/repos/MetaCubeX/ClashMetaForAndroid/releases/latest | jq ".assets[] | {browser_download_url}" -c | jq .browser_download_url -r | aria2c -c -x 8 -s 8 -j 1 -k 1M -i -
-          popd || exit 1
-          # clash-verge
-          mkdir -p clash-verge/Clients
-          pushd clash-verge/Clients || exit 1
-          wget -qO- https://api.github.com/repos/zzzgydi/clash-verge/releases/latest | jq ".assets[] | {browser_download_url}" -c | jq .browser_download_url -r | aria2c -c -x 8 -s 8 -j 1 -k 1M -i -
-          popd || exit 1
-          # clash-verge-rev
-          mkdir -p clash-verge-rev/Clients
-          pushd clash-verge-rev/Clients || exit 1
-          wget -qO- https://api.github.com/repos/wonfen/clash-verge-rev/releases/latest | jq ".assets[] | {browser_download_url}" -c | jq .browser_download_url -r | aria2c -c -x 8 -s 8 -j 1 -k 1M -i -
-          popd || exit 1
-          # clash-nyanpasu
-          mkdir -p clash-nyanpasu/Clients
-          pushd clash-nyanpasu/Clients || exit 1
-          wget -qO- https://api.github.com/repos/keiko233/clash-nyanpasu/releases/latest | jq ".assets[] | {browser_download_url}" -c | jq .browser_download_url -r | aria2c -c -x 8 -s 8 -j 1 -k 1M -i -
-          popd || exit 1
-          # clashn
-          mkdir -p clashn/Clients
-          pushd clashn/Clients || exit 1
-          wget -qO- https://api.github.com/repos/2dust/clashN/releases/latest | jq ".assets[] | {browser_download_url}" -c | jq .browser_download_url -r | aria2c -c -x 8 -s 8 -j 1 -k 1M -i -
-          popd || exit 1
-          # svt-android
-          mkdir -p svt-android/Clients
-          pushd svt-android/Clients || exit 1
-          wget -qO- https://api.github.com/repos/xxf098/shadowsocksr-v2ray-trojan-android/releases/latest | jq ".assets[] | {browser_download_url}" -c | jq .browser_download_url -r | aria2c -c -x 8 -s 8 -j 1 -k 1M -i -
-          popd || exit 1
-          # nekoray
-          mkdir -p nekoray/Clients
-          pushd nekoray/Clients || exit 1
-          wget -qO- https://api.github.com/repos/MatsuriDayo/nekoray/releases/latest | jq ".assets[] | {browser_download_url}" -c | jq .browser_download_url -r | aria2c -c -x 8 -s 8 -j 1 -k 1M -i -
-          popd || exit 1
-          # nekobox-android
-          mkdir -p nekobox-android/Clients
-          pushd nekobox-android/Clients || exit 1
-          wget -qO- https://api.github.com/repos/MatsuriDayo/NekoBoxForAndroid/releases/latest | jq ".assets[] | {browser_download_url}" -c | jq .browser_download_url -r | aria2c -c -x 8 -s 8 -j 1 -k 1M -i -
-          popd || exit 1
-          # ryujinx-release-channel
-          mkdir -p ryujinx-release-channel/Clients
-          pushd ryujinx-release-channel/Clients || exit 1
-          wget -qO- https://api.github.com/repos/Ryujinx/release-channel-master/releases/latest | jq ".assets[] | {browser_download_url}" -c | jq .browser_download_url -r | aria2c -c -x 8 -s 8 -j 1 -k 1M -i -
-          popd || exit 1
-          # v2ray-rules-dat
-          mkdir -p v2ray-rules-dat/Clients
-          pushd v2ray-rules-dat/Clients || exit 1
-          wget -qO- https://api.github.com/repos/Loyalsoldier/v2ray-rules-dat/releases/latest | jq ".assets[] | {browser_download_url}" -c | jq .browser_download_url -r | aria2c -c -x 8 -s 8 -j 1 -k 1M -i -
-          popd || exit 1
-          # geoip
-          mkdir -p geoip/Clients
-          pushd geoip/Clients || exit 1
-          wget -qO- https://api.github.com/repos/Loyalsoldier/geoip/releases/latest | jq ".assets[] | {browser_download_url}" -c | jq .browser_download_url -r | aria2c -c -x 8 -s 8 -j 1 -k 1M -i -
-          popd || exit 1
-          # udp2raw
-          mkdir -p udp2raw/Clients
-          pushd udp2raw/Clients || exit 1
-          wget -qO- https://api.github.com/repos/wangyu-/udp2raw/releases/latest | jq ".assets[] | {browser_download_url}" -c | jq .browser_download_url -r | aria2c -c -x 8 -s 8 -j 1 -k 1M -i -
-          popd || exit 1
-          # udp2raw-multi
-          mkdir -p udp2raw-multi/Clients
-          pushd udp2raw-multi/Clients || exit 1
-          wget -qO- https://api.github.com/repos/wangyu-/udp2raw-multiplatform/releases/latest | jq ".assets[] | {browser_download_url}" -c | jq .browser_download_url -r | aria2c -c -x 8 -s 8 -j 1 -k 1M -i -
-          popd || exit 1
-          # brook
-          mkdir -p brook/Clients
-          pushd brook/Clients || exit 1
-          wget -qO- https://api.github.com/repos/txthinking/brook/releases/latest | jq ".assets[] | {browser_download_url}" -c | jq .browser_download_url -r | aria2c -c -x 8 -s 8 -j 1 -k 1M -i -
-          popd || exit 1
-          # netch
-          mkdir -p netch/Clients
-          pushd netch/Clients || exit 1
-          export NETCH_VER=$(wget -qO- https://api.github.com/repos/netchx/netch/tags | grep 'name' | cut -d\" -f4 | sort -hr | sed $'/\//d' | head -1)
-          wget -qO- https://api.github.com/repos/netchx/netch/releases/tags/${NETCH_VER} | jq ".assets[] | {browser_download_url}" -c | jq .browser_download_url -r | aria2c -c -x 8 -s 8 -j 1 -k 1M -i -
-          popd || exit 1
-          # bbdown
-          mkdir -p bbdown/Clients
-          pushd bbdown/Clients || exit 1
-          wget -qO- https://api.github.com/repos/nilaoda/BBDown/releases/latest | jq ".assets[] | {browser_download_url}" -c | jq .browser_download_url -r | aria2c -c -x 8 -s 8 -j 1 -k 1M -i -
-          popd || exit 1
-          # youtube-dl
-          mkdir -p youtube-dl/Clients
-          pushd youtube-dl/Clients || exit 1
-          wget -qO- https://api.github.com/repos/ytdl-org/youtube-dl/releases/latest | jq ".assets[] | {browser_download_url}" -c | jq .browser_download_url -r | aria2c -c -x 8 -s 8 -j 1 -k 1M -i -
-          popd || exit 1
-          # yt-dlp
-          mkdir -p yt-dlp/Clients
-          pushd yt-dlp/Clients || exit 1
-          wget -qO- https://api.github.com/repos/yt-dlp/yt-dlp/releases/latest | jq ".assets[] | {browser_download_url}" -c | jq .browser_download_url -r | aria2c -c -x 8 -s 8 -j 1 -k 1M -i -
-          popd || exit 1
-          # lanzou-gui
-          mkdir -p lanzou-gui/Clients
-          pushd lanzou-gui/Clients || exit 1
-          wget -qO- https://api.github.com/repos/rachpt/lanzou-gui/releases/latest | jq ".assets[] | {browser_download_url}" -c | jq .browser_download_url -r | aria2c -c -x 8 -s 8 -j 1 -k 1M -i -
-          popd || exit 1
-          # aliyunpan
-          mkdir -p aliyunpan/Clients
-          pushd aliyunpan/Clients || exit 1
-          wget -qO- https://api.github.com/repos/gaozhangmin/aliyunpan/releases/latest | jq ".assets[] | {browser_download_url}" -c | jq .browser_download_url -r | aria2c -c -x 8 -s 8 -j 1 -k 1M -i -
-          popd || exit 1
-          # filebrowser
-          mkdir -p filebrowser/Clients
-          pushd filebrowser/Clients || exit 1
-          wget -qO- https://api.github.com/repos/filebrowser/filebrowser/releases/latest | jq ".assets[] | {browser_download_url}" -c | jq .browser_download_url -r | aria2c -c -x 8 -s 8 -j 1 -k 1M -i -
-          popd || exit 1
-          # m3u8-cli
-          mkdir -p m3u8-cli/Clients
-          pushd m3u8-cli/Clients || exit 1
-          wget -qO- https://api.github.com/repos/nilaoda/N_m3u8DL-CLI/releases/latest | jq ".assets[] | {browser_download_url}" -c | jq .browser_download_url -r | aria2c -c -x 8 -s 8 -j 1 -k 1M -i -
-          popd || exit 1
-          # yesplaymusic
-          mkdir -p yesplaymusic/Clients
-          pushd yesplaymusic/Clients || exit 1
-          wget -qO- https://api.github.com/repos/qier222/YesPlayMusic/releases/latest | jq ".assets[] | {browser_download_url}" -c | jq .browser_download_url -r | aria2c -c -x 8 -s 8 -j 1 -k 1M -i -
           popd || exit 1
 
       - name: Commit and push changes
