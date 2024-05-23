@@ -64,7 +64,7 @@ jobs:
           git lfs track "*.7z"
           git lfs track "*.apk"
           git add .gitattributes
-          git commit -m "更新时间：${{ env.current_time }}"
+          git commit -m "Track large files with Git LFS"
 
       - name: Commit and push changes
         env:
