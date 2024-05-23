@@ -57,6 +57,8 @@ jobs:
           git config --global user.name "GitHub Action"
 
       - name: Track large files with Git LFS
+        env:
+          current_time: ${{ env.current_time }}
         run: |
           git lfs track "*.zip"
           git lfs track "*.7z"
