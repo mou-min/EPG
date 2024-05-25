@@ -1,45 +1,87 @@
-name: Fetch v2rayN Releases
+name: Backup Binaries
 
 on:
+  workflow_dispatch:
   schedule:
-    - cron: '0 0 * * *' # 每天运行一次
-  workflow_dispatch: # 手动触发
+    - cron: "0 * */2 * *" # 每两天运行一次
 
 jobs:
-  fetch-releases:
+  fetch_and_save:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-
-      - name: Set up Python
-        uses: actions/setup-python@v2
         with:
-          python-version: '3.x'
+          lfs: true  # 启用 LFS
 
+      - name: Set timezone and current time
+        run: |
+          current_time=$(TZ="Asia/Shanghai" date +"%Y-%m-%d %H:%M:%S")
+          echo "current_time=${current_time}" >> $GITHUB_ENV
       - name: Install dependencies
-        run: |
-          python -m pip install requests
+        run: sudo apt-get install -y aria2 jq
 
-      - name: Fetch v2rayN releases
+      - name: Download v2rayN assets (release)
+        run: |
+          release_tag=$(curl -s https://api.github.com/repos/2dust/v2rayN/releases/latest | jq -r ".tag_name")
+          mkdir -p "Archive/v2rayN/Release_${release_tag}"
+          cd "Archive/v2rayN/Release_${release_tag}"
+          assets=$(curl -s https://api.github.com/repos/2dust/v2rayN/releases/latest | jq -r ".assets[] | .name + \" \" + .browser_download_url")
+          echo "$assets" | while IFS= read -r line; do
+            name=$(echo "$line" | cut -d' ' -f1)
+            url=$(echo "$line" | cut -d' ' -f2)
+            wget -O "$name" "$url"
+          done
+      - name: Download v2rayN assets (pre-release)
+        run: |
+          prerelease_tag=$(curl -s https://api.github.com/repos/2dust/v2rayN/releases | jq -r '[.[] | select(.prerelease == true)][0].tag_name')
+          mkdir -p "Archive/v2rayN/PreRelease_${prerelease_tag}"
+          cd "Archive/v2rayN/PreRelease_${prerelease_tag}"
+          assets=$(curl -s https://api.github.com/repos/2dust/v2rayN/releases | jq -r '[.[] | select(.prerelease == true)][0].assets[] | .name + " " + .browser_download_url')
+          echo "$assets" | while IFS= read -r line; do
+            name=$(echo "$line" | cut -d' ' -f1)
+            url=$(echo "$line" | cut -d' ' -f2)
+            wget -O "$name" "$url"
+          done
+          
+      - name: Install Git LFS
+        run: |
+          curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
+          sudo apt-get install git-lfs
+          git lfs install
+      - name: Configure Git user
+        run: |
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
+      - name: Track large files with Git LFS
         env:
-          GITHUB_REPOSITORY: '2dust/v2rayN'
+          current_time: ${{ env.current_time }}
         run: |
-          python fetch_releases.py
-
+          git lfs track "*.zip"
+          git lfs track "*.7z"
+          git lfs track "*.apk"
+          git add .gitattributes
+          if git diff --cached --quiet; then
+            echo "No changes in .gitattributes"
+          else
+            git commit -m "更新时间：${{ env.current_time }}"
+          fi
       - name: Commit and push changes
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          current_time: ${{ env.current_time }}
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add v2rayN_releases.json
-          git status  # 检查添加的文件状态
-          if git diff-index --quiet HEAD --; then
+          git add Archive/
+          if git diff --cached --quiet; then
             echo "No changes to commit"
           else
-            current_time=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-            git commit -m "更新时间：$current_time"
+            git stash
             git pull --rebase origin main
+            git stash pop
+            git add Archive/
+            git add .gitattributes
+            git commit -m "更新时间：${{ env.current_time }}"
             git push origin main
+          fi
