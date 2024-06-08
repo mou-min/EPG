@@ -28,6 +28,7 @@ jobs:
           curl -o "e1.xml.gz" http://epg.51zmt.top:8000/e.xml.gz
           curl -o "e2.xml.gz" https://gitee.com/Black_crow/xmlgz/raw/master/all.xml.gz
           php xml2db.php
+          tar -czvf channel_epg.db.tar.gz channel_epg.db
 
       - name: Commit and push changes
         env:
