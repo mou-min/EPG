@@ -13,6 +13,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
       
       - name: Fetch XML files
         run: |
@@ -22,6 +27,7 @@ jobs:
           curl -o "pp.xml.gz" https://epg.112114.xyz/pp.xml.gz
           curl -o "e1.xml.gz" http://epg.51zmt.top:8000/e.xml.gz
           curl -o "e2.xml.gz" https://gitee.com/Black_crow/xmlgz/raw/master/all.xml.gz
+          php xml2db.php
 
       - name: Commit and push changes
         env:
