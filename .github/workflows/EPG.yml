@@ -34,7 +34,7 @@ jobs:
         uses: Mattraks/delete-workflow-runs@main
         with:
              retain_days: 7
-             keep_minimum_runs: 50
+             keep_minimum_runs: 30
              
       - name: Commit and push changes
         env:
