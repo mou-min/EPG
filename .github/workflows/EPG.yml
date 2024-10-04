@@ -30,6 +30,12 @@ jobs:
           php xml2db.php
           tar -czvf channel_epg.db.tar.gz channel_epg.db
 
+      - name: Delete workflow runs
+        uses: Mattraks/delete-workflow-runs@main
+        with:
+             retain_days: 7
+             keep_minimum_runs: 50
+             
       - name: Commit and push changes
         env:
           current_time: ${{ env.current_time }}
