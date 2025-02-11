@@ -27,10 +27,8 @@ jobs:
           curl -o "pp.xml.gz" https://epg.112114.xyz/pp.xml.gz
           curl -o "e1.xml.gz" http://epg.51zmt.top:8000/e.xml.gz
           curl -o "e2.xml.gz" https://gitee.com/Black_crow/xmlgz/raw/master/all.xml.gz
-          wget https://github.com/sparkssssssssss/epg/raw/refs/heads/main/pp.xml.gz -O epg.tar.gz
-          du -sh epg.tar.gz
+          rm channel_epg.db.tar.gz channel_epg.db
           php xml2db.php
-          cat xml2db.php
           tar -czvf channel_epg.db.tar.gz channel_epg.db
 
       - name: Delete workflow runs
