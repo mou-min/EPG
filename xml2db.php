@@ -120,7 +120,7 @@ function getContent($url)
 // $xmlurl = array("http://epg.51zmt.top:8000/cc.xml", "http://epg.erw.cc/cc.xml", "http://epg.112114.xyz/pp.xml"); //当天 央卫 节目单
 // $xmlurl = array("http://epg.112114.xyz/pp.xml.gz", "http://epg.51zmt.top:8000/e.xml.gz", "https://gitee.com/Black_crow/xmlgz/raw/master/e.xml.gz"); //gzip模式
 //$xmlurl = array("https://gitee.com/Black_crow/xmlgz/raw/master/all.xml.gz"); //https gzip模式
-$xmlurl = array("https://github.com/sparkssssssssss/epg/blob/main/pp.xml.gz"); //https gzip模式
+$xmlurl = array("https://github.com/sparkssssssssss/epg/raw/refs/heads/main/pp.xml.gz"); //https gzip模式
 // .
 // 遍历xmlurl,同步epg xml数据源
 $oknum = 1;
