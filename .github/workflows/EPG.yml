@@ -26,8 +26,7 @@ jobs:
           echo "current_time=${current_time}" >> $GITHUB_ENV
           curl -o "pp.xml.gz" https://epg.112114.xyz/pp.xml.gz
           curl -o "e1.xml.gz" http://epg.51zmt.top:8000/e.xml.gz
-          curl -o "e2.xml.gz" https://gitee.com/Black_crow/xmlgz/raw/master/all.xml.gz
-          rm channel_epg.db.tar.gz channel_epg.db
+          # curl -o "e2.xml.gz" https://gitee.com/Black_crow/xmlgz/raw/master/all.xml.gz
           php xml2db.php
           tar -czvf channel_epg.db.tar.gz channel_epg.db
 
