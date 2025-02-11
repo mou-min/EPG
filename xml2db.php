@@ -8,7 +8,7 @@ $save_all = 1; // 1 保存全量节目单, 0 仅保存list中频道相关的节�
 $empty_tmp = 1; // 1 入库后清除临时表的数据, 0 保留临时表的数据,建议调测期间设置为0, 调测完毕后修改为1,减少存储空间
 $deleteoffset = -8; // 清理xx天前的节目数据
 $deletetoday = 1; // 更新数据前先删除当天节目数据
-error_reporting(0); // 禁止输出错误提示
+error_reporting(1); // 禁止输出错误提示
 $displayname = 'display-name';
 $n = 0;
 $inserttype = 'ignore'; // replace  or ignore
@@ -119,8 +119,7 @@ function getContent($url)
 // $xmlurl = array("http://epg.51zmt.top:8000/e.xml", "http://epg.erw.cc/e.xml", "http://epg.112114.xyz/pp.xml"); //当天 央卫数 节目单
 // $xmlurl = array("http://epg.51zmt.top:8000/cc.xml", "http://epg.erw.cc/cc.xml", "http://epg.112114.xyz/pp.xml"); //当天 央卫 节目单
 // $xmlurl = array("http://epg.112114.xyz/pp.xml.gz", "http://epg.51zmt.top:8000/e.xml.gz", "https://gitee.com/Black_crow/xmlgz/raw/master/e.xml.gz"); //gzip模式
-//$xmlurl = array("https://cdn.jsdelivr.us/gh/mou-min/EPG@main/e1.xml.gz", "https://cdn.jsdelivr.us/gh/mou-min/EPG@main/e2.xml.gz", "https://cdn.jsdelivr.us/gh/mou-min/EPG@main/pp.xml.gz"); //https gzip模式
-$xmlurl = array("https://github.com/mou-min/EPG/raw/refs/heads/main/e1.xml.gz","https://github.com/mou-min/EPG/raw/refs/heads/main/pp.xml.gz");
+$xmlurl = array("https://epg.112114.xyz/pp.xml.gz", "https://github.com/sparkssssssssss/epg/raw/refs/heads/main/pp.xml.gz"); //https gzip模式
 // .
 // 遍历xmlurl,同步epg xml数据源
 $oknum = 1;
